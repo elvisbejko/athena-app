@@ -101,10 +101,7 @@ def main() -> dict:
     )
 
     options = Options()
-    options.add_argument("--headless")  # no UI
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-
+    options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
     service = Service("/usr/bin/chromedriver")  # Dockerfile
     driver = webdriver.Chrome(service=service, options=options)
     try:
