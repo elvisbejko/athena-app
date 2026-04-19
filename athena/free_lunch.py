@@ -15,10 +15,6 @@ from typing import Any, Callable, Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver  # linter
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 
 
 def measure(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -70,25 +66,6 @@ def log(main: Callable[[], dict]) -> dict:
             logs = stream.read() + "\n" + traceback.format_exc()
             logs = re.sub(r"api_token=.{50}", "token=xxx", logs)
             return {"logs": logs[-64000:]}
-
-
-@measure
-def click_hide_nav_bar(driver: WebDriver) -> None:
-    """
-    Remove the left side bar so that the graphs take up more space in the
-    screen. Reduce clutter in the final screenshot; WebDriverWait is safer as
-    it waits for the icon to be clicable.
-
-    """
-    # wait up to 10 seconds for the nav link to be clickable
-    menu_link = WebDriverWait(driver, 10).until(
-        ec.element_to_be_clickable(
-            (By.CSS_SELECTOR, "a.nav-item.nav-link.px-0.mr-4.cursor-pointer")
-        )
-    )
-
-    menu_link.click()
-    time.sleep(2)
 
 
 @measure
