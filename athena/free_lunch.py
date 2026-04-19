@@ -5,10 +5,12 @@ import io
 import json
 import logging
 import re
+import socket
 import sys
 import time
 import traceback
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Callable, Optional
 
 from selenium import webdriver
@@ -93,59 +95,31 @@ def click_hide_nav_bar(driver: WebDriver) -> None:
 @measure
 def main() -> dict:
     """Logical entry point."""
-    print(
-        (
-            "[INFO]: Automated SF execution time (UTC): "
-            f"{datetime.now(timezone.utc)}."
-        )
-    )
+    chrome_path = Path(r"C:\Tools\chrome\chrome.exe")
+    driver_path = Path(r"C:\Tools\chromedriver\chromedriver.exe")
+
+    if not chrome_path.is_file():
+        raise FileNotFoundError(f"Chrome not found at: {chrome_path}")
+
+    if not driver_path.is_file():
+        raise FileNotFoundError(f"Chromedriver not found at: {driver_path}")
 
     options = Options()
-    options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-    service = Service("/usr/bin/chromedriver")  # Dockerfile
+    options.debugger_address = "127.0.0.1:9222"
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.binary_location = str(chrome_path)  # TODO: check if needed
+
+    service = Service(driver_path)
+
+    # NOTE: First check sockets, then instantiate driver
+    if socket.socket().connect_ex(("127.0.0.1", 9222)) != 0:
+        print(f"[ERROR]: Chrome debug is not listening on 127.0.0.1: 9222")
+        print(f"[INFO]: Usage: 'chrome --remote-debugging-port=9222'")
+        return {}
+
     driver = webdriver.Chrome(service=service, options=options)
-    try:
-        driver.set_window_size(1920, 1080)
-        driver.get("https://www.amdocs-ti.com/login")
-        try:
-            email_field = WebDriverWait(driver, 120).until(
-                ec.presence_of_element_located((By.ID, "email"))
-            )
-            email_field.send_keys(ti_email)
-        except Exception:
-            print("[ERROR]: Timed out on email field identification.")
-
-        password_field = driver.find_element(By.ID, "password")
-        password_field.send_keys(ti_pwd)
-        login_button = driver.find_element(By.CLASS_NAME, "btn-primary")
-        login_button.click()
-
-        driver.get(
-            (
-                "https://www.amdocs-ti.com/mobia/projects/bpa360_1/reports/"
-                "mobia-report"
-            )
-        )
-        # hyperparameters
-        try:
-            WebDriverWait(driver, 120).until(
-                ec.presence_of_element_located((By.ID, "app-pm-widget"))
-            )
-            time.sleep(45)
-            driver.execute_script("document.body.style.zoom='85%'")
-            click_hide_nav_bar(driver)
-        except Exception:
-            print("[ERROR]: Timed out on app-widget field identification.")
-            # TODO(elvis): What should I do here if the app errs?
-    finally:  # the driver is free to quit after the screenshots are taken
-        driver.quit()
-
-    print(
-        (
-            "[INFO]: Automated SF completion time (UTC): "
-            f"{datetime.now(timezone.utc)}."
-        )
-    )
+    print(driver.title)
     return {}
 
 
