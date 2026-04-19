@@ -15,6 +15,7 @@ from typing import Any, Callable, Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 
 
 def measure(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -90,12 +91,23 @@ def main() -> dict:
 
     # NOTE: First check socket & then instantiate driver
     if socket.socket().connect_ex(("127.0.0.1", 9222)) != 0:
-        print(f"[ERROR]: Chrome debug is not listening on 127.0.0.1: 9222")
+        print(f"[ERROR]: Chrome debug is not listening on 127.0.0.1:9222")
         print(f"[INFO]: Usage: 'chrome --remote-debugging-port=9222'")
         return {}
 
     driver = webdriver.Chrome(service=service, options=options)
     print(driver.title)
+
+    body = driver.find_element(By.TAG_NAME, "body")
+    # main event loop
+    try:
+        while True:
+            body.send_keys("z")
+            print("[INFO]: pressed z")
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print("[INFO]: stopped")
+
     return {}
 
 
