@@ -88,7 +88,7 @@ def main() -> dict:
 
     service = Service(driver_path)
 
-    # NOTE: First check sockets, then instantiate driver
+    # NOTE: First check socket & then instantiate driver
     if socket.socket().connect_ex(("127.0.0.1", 9222)) != 0:
         print(f"[ERROR]: Chrome debug is not listening on 127.0.0.1: 9222")
         print(f"[INFO]: Usage: 'chrome --remote-debugging-port=9222'")
