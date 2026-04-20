@@ -27,7 +27,7 @@ jobs:
       - name: Build exe
         working-directory: athena
         run: |
-          pyinstaller --onefile free_launch.py
+          pyinstaller --onefile free_lunch.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
