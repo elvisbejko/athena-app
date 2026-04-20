@@ -4,6 +4,7 @@ import contextlib
 import io
 import json
 import logging
+import random
 import re
 import socket
 import sys
@@ -16,6 +17,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 def measure(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -69,6 +72,28 @@ def log(main: Callable[[], dict]) -> dict:
             return {"logs": logs[-64000:]}
 
 
+def click_play_button(driver) -> None:
+    """Clicks the play."""
+    btn = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable(
+            (
+                By.CSS_SELECTOR,
+                "button.play-controls-container__play-pause-button",
+            )
+        )
+    )
+    btn.click()
+
+
+def emit_curr_total(driver) -> None:
+    """Emit current and total pages."""
+    label = driver.find_element(
+        By.CSS_SELECTOR, "div.navigation-controls__label"
+    )
+    current, total = map(int, label.text.split(" of "))
+    print(f"[LOOP]: On page: {current} out of {total}")
+
+
 @measure
 def main() -> dict:
     """Logical entry point."""
@@ -98,27 +123,37 @@ def main() -> dict:
     driver = webdriver.Chrome(service=service, options=options)
     print(driver.title)
 
-    body = driver.find_element(By.TAG_NAME, "body")
-    # main event loop
-    try:
-        while True:
-            body.send_keys("z")
-            print("[INFO]: pressed z")
-            time.sleep(2)
-    except KeyboardInterrupt:
-        print("[INFO]: stopped")
+    # wait for iframe
+    iframe = WebDriverWait(driver, 1).until(
+        EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+    )
+    driver.switch_to.frame(iframe)
+    label = driver.find_element(
+        By.CSS_SELECTOR, "div.navigation-controls__label"
+    )
+
+    current, total = map(int, label.text.split(" of "))
+    print(f"[INFO]: Selenium started on current: {current}")
+    print(f"[INFO]: Selenium started on total: {total}")
+
+    while current < total:
+        click_play_button(driver=driver)
+        emit_curr_total(driver=driver)
+        time.sleep(random.triangular(30, 50, 50))
+        current += 1
 
     return {}
 
 
 def execute() -> dict:
     """SF entry point."""
-    return log(main)
+    return main()
 
 
 if __name__ == "__main__":
     """Dev entry point. Does not affect deployment."""
     state = execute()
-    state["logs"] = state["logs"].replace("\\n", "\n")
-    print(state.pop("logs"))
     print(json.dumps(state, indent=2))
+    # state["logs"] = state["logs"].replace("\\n", "\n")
+    # print(state.pop("logs"))
+    # print(json.dumps(state, indent=2))
