@@ -24,20 +24,21 @@ jobs:
           pip install pyinstaller
 
       - name: Build exe
+        working-directory: athena
         run: |
-          pyinstaller --onefile athena-app/athena/free_launch.py
+          pyinstaller --onefile free_launch.py
 
-      - name: Upload artifact (debug)
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: free_launch
-          path: dist/free_launch.exe
+          path: athena/dist/free_launch.exe
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-${{ github.run_number }}
           name: Auto Release ${{ github.run_number }}
-          files: dist/free_launch.exe
+          files: athena/dist/free_launch.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
