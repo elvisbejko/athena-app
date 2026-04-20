@@ -25,7 +25,7 @@ jobs:
 
       - name: Build exe
         run: |
-          pyinstaller --onefile athena/free_launch.py
+          pyinstaller --onefile athena-app/athena/free_launch.py
 
       - name: Upload artifact (debug)
         uses: actions/upload-artifact@v4
