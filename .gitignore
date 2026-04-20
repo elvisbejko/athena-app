@@ -1,4 +1,6 @@
+athena/dist
 .venv
 *.egg-info
 build
 __pycache__
+*.spec
