@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -22,24 +25,24 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install pyinstaller
-          pip install .
 
       - name: Build exe
-        working-directory: athena
         run: |
-          pyinstaller --onefile free_lunch.py
+          pyinstaller --onefile athena/free_launch.py
+          echo --------------------
+          dir /s free_launch.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: free_launch
-          path: athena/dist/free_launch.exe
+          path: dist/free_launch.exe
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-${{ github.run_number }}
           name: Auto Release ${{ github.run_number }}
-          files: athena/dist/free_launch.exe
+          files: dist/free_launch.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
