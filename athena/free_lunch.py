@@ -179,11 +179,15 @@ def main() -> dict:
     print(f"[INFO]: Slide uniformly in range ({min_sec}s,{max_sec}s)")
 
     while current < total:
-        current += 1
+        # play slide
         click_play_button(driver=driver)
+
         # spinner
         wait_time = random.triangular(min_sec, max_sec, max_sec)
         wait_with_spinner(wait_time, current, total)
+
+        # incr
+        current += 1
 
     return {}
 
