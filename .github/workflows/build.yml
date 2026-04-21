@@ -21,9 +21,7 @@ jobs:
 
       - run: pip install -r requirements.txt pyinstaller
 
-      - name: Build
-        working-directory: athena
-        run: pyinstaller --onefile free_lunch.py
+      - run: pyinstaller --onefile athena/free_lunch.py
 
       - uses: actions/upload-artifact@v4
         with:
