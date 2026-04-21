@@ -174,6 +174,7 @@ if __name__ == "__main__":
     """Dev entry point. Does not affect deployment."""
     state = execute()
     print(json.dumps(state, indent=2))
+    input("\nPress Enter to exit...")
     # state["logs"] = state["logs"].replace("\\n", "\n")
     # print(state.pop("logs"))
     # print(json.dumps(state, indent=2))
