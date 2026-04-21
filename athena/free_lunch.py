@@ -88,17 +88,39 @@ def click_play_button(driver) -> None:
 
 def emit_curr_total(driver) -> None:
     """Emit current and total pages."""
+    width = 30
     label = driver.find_element(
         By.CSS_SELECTOR, "div.navigation-controls__label"
     )
     current, total = map(int, label.text.split(" of "))
-    print(f"[LOOP]: On slide:{current}/{total}")
+    # Custom progress bar
+    filled = int(width * current / total)
+    bar = "#" * filled + "-" * (width - filled)
+    print(f"\r[{bar}] {current}/{total}", end="", flush=True)
 
 
 def load_settings() -> dict:
     """Load config from settings.json. Assumed in the same dir as the .exe."""
     with open("settings.toml", "rb") as f:
         return tomllib.load(f)
+
+
+def wait_with_spinner(seconds: float, current: int, total: int) -> None:
+    """Waiting spinner that does not override the progress bar."""
+    width = 30
+
+    for i in range(int(seconds)):
+        filled = int(width * current / total)
+        bar = "#" * filled + "-" * (width - filled)
+        spinner = "|/-\\"[i % 4]
+
+        # NOTE: The space after s is needed for proper flushing
+        print(
+            f"\r[{bar}] {current}/{total} {spinner} {i}s ",
+            end="",
+            flush=True,
+        )
+        time.sleep(1)
 
 
 @measure
@@ -157,10 +179,11 @@ def main() -> dict:
     print(f"[INFO]: Slide uniformly in range ({min_sec}s,{max_sec}s)")
 
     while current < total:
-        click_play_button(driver=driver)
-        emit_curr_total(driver=driver)
-        time.sleep(random.triangular(min_sec, max_sec, max_sec))
         current += 1
+        click_play_button(driver=driver)
+        # spinner
+        wait_time = random.triangular(min_sec, max_sec, max_sec)
+        wait_with_spinner(wait_time, current, total)
 
     return {}
 
