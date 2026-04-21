@@ -1,9 +1,8 @@
-name: Build Windows EXE
+name: build
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: write
@@ -11,23 +10,17 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - run: pip install -r requirements.txt pyinstaller
-
       - run: pyinstaller --onefile athena/free_lunch.py
-
       - uses: actions/upload-artifact@v4
         with:
-          name: free_lunch
+          name: exe
           path: dist/free_lunch.exe
-
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-${{ github.run_number }}
