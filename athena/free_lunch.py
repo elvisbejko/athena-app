@@ -9,6 +9,7 @@ import re
 import socket
 import sys
 import time
+import tomllib
 import traceback
 from pathlib import Path
 from typing import Any, Callable, Optional
@@ -94,17 +95,32 @@ def emit_curr_total(driver) -> None:
     print(f"[LOOP]: On page: {current} out of {total}")
 
 
+def load_settings() -> dict:
+    """Load config from settings.json. Assumed in the same dir as the .exe."""
+    with open("settings.toml", "rb") as f:
+        return tomllib.load(f)
+
+
 @measure
 def main() -> dict:
     """Logical entry point."""
-    chrome_path = Path(r"C:\Tools\chrome\chrome.exe")
-    driver_path = Path(r"C:\Tools\chromedriver\chromedriver.exe")
+    try:
+        settings = load_settings()
+    except FileNotFoundError:
+        print(f"[ERROR]: The settings.json must be in the same dir at the exe")
+        return {}
+    chrome_path = Path(settings.get("chrome_path", ""))
+    driver_path = Path(settings.get("driver_path", ""))
+    # chrome_path = Path(r"C:\Tools\chrome\chrome.exe")
+    # driver_path = Path(r"C:\Tools\chromedriver\chromedriver.exe")
 
     if not chrome_path.is_file():
-        raise FileNotFoundError(f"Chrome not found at: {chrome_path}")
+        print(f"[ERROR]: chrome.exe not found at {chrome_path}")
+        return {}
 
     if not driver_path.is_file():
-        raise FileNotFoundError(f"Chromedriver not found at: {driver_path}")
+        print(f"[ERROR]: chromedriver not found at {driver_path}")
+    return {}
 
     options = Options()
     options.debugger_address = "127.0.0.1:9222"

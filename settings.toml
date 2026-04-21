@@ -1,0 +1,2 @@
+chrome_path = 'C:\Tools\chrome\chrome.exe'
+driver_path = 'C:\Tools\chromedriver\chromedriver.exe'

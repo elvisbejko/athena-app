@@ -24,7 +24,7 @@ jobs:
       - run: |
           mkdir release
           copy dist/free_lunch.exe release/free_lunch.exe
-          copy settings.json release/settings.json
+          copy settings.toml release/settings.toml
 
       - run: powershell Compress-Archive -Path release/* -DestinationPath free_lunch-windows.zip
 
