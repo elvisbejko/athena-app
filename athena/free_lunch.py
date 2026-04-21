@@ -92,7 +92,7 @@ def emit_curr_total(driver) -> None:
         By.CSS_SELECTOR, "div.navigation-controls__label"
     )
     current, total = map(int, label.text.split(" of "))
-    print(f"[LOOP]: On page: {current} out of {total}")
+    print(f"[LOOP]: On slide:{current}/{total}")
 
 
 def load_settings() -> dict:
@@ -118,6 +118,9 @@ def main() -> dict:
 
     if not driver_path.is_file():
         print(f"[ERROR]: chromedriver not found at {driver_path}")
+
+    print(f"[INFO]: Found chrome in {chrome_path}")
+    print(f"[INFO]: Found chromedriver in {driver_path}")
 
     options = Options()
     options.debugger_address = "127.0.0.1:9222"
@@ -149,12 +152,13 @@ def main() -> dict:
     print(f"[INFO]: Selenium started on current: {current}")
     print(f"[INFO]: Selenium started on total: {total}")
 
+    min_sec = settings.get("min_s", 30)
+    max_sec = settings.get("max_s", 50)
+    print(f"[INFO]: Slide uniformly in the range ({min_sec},{max_sec})")
+
     while current < total:
         click_play_button(driver=driver)
         emit_curr_total(driver=driver)
-        min_sec = settings.get("min_s", 30)
-        max_sec = settings.get("max_s", 50)
-        print(f"[INFO]: Change uniformly in the range ({min_sec},{max_sec})")
         time.sleep(random.triangular(min_sec, max_sec, max_sec))
         current += 1
 
