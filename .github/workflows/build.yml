@@ -12,18 +12,30 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - run: pip install -r requirements.txt pyinstaller
+
       - run: pyinstaller --onefile athena/free_lunch.py
+
+      - run: |
+          mkdir release
+          copy dist/free_lunch.exe release/free_lunch.exe
+          copy settings.json release/settings.json
+
+      - run: powershell Compress-Archive -Path release/* -DestinationPath free_lunch-windows.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: exe
-          path: dist/free_lunch.exe
+          path: free_lunch-windows.zip
+
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-${{ github.run_number }}
-          files: dist/free_lunch.exe
+          files: free_lunch-windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
