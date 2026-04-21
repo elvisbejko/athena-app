@@ -119,8 +119,8 @@ def main() -> dict:
     if not driver_path.is_file():
         print(f"[ERROR]: chromedriver not found at {driver_path}")
 
-    print(f"[INFO]: Found chrome in {chrome_path}")
-    print(f"[INFO]: Found chromedriver in {driver_path}")
+    print(f"[DEBUG]: Found chrome in {chrome_path}")
+    print(f"[DEBUG]: Found chromedriver in {driver_path}")
 
     options = Options()
     options.debugger_address = "127.0.0.1:9222"
@@ -154,7 +154,7 @@ def main() -> dict:
 
     min_sec = settings.get("min_s", 30)
     max_sec = settings.get("max_s", 50)
-    print(f"[INFO]: Slide uniformly in the range ({min_sec},{max_sec})")
+    print(f"[INFO]: Slide uniformly in range ({min_sec}s,{max_sec}s)")
 
     while current < total:
         click_play_button(driver=driver)
