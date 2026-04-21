@@ -13,36 +13,26 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
+      - run: pip install -r requirements.txt pyinstaller
 
-      - name: Build exe
-        run: |
-          pyinstaller --onefile athena/free_launch.py
-          echo --------------------
-          dir /s free_launch.exe
+      - name: Build
+        working-directory: athena
+        run: pyinstaller --onefile free_launch.py
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: free_launch
-          path: dist/free_launch.exe
+          path: athena/dist/free_launch.exe
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-${{ github.run_number }}
-          name: Auto Release ${{ github.run_number }}
-          files: dist/free_launch.exe
+          files: athena/dist/free_launch.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
