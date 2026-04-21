@@ -111,8 +111,6 @@ def main() -> dict:
         return {}
     chrome_path = Path(settings.get("chrome_path", ""))
     driver_path = Path(settings.get("driver_path", ""))
-    # chrome_path = Path(r"C:\Tools\chrome\chrome.exe")
-    # driver_path = Path(r"C:\Tools\chromedriver\chromedriver.exe")
 
     if not chrome_path.is_file():
         print(f"[ERROR]: chrome.exe not found at {chrome_path}")
@@ -120,7 +118,6 @@ def main() -> dict:
 
     if not driver_path.is_file():
         print(f"[ERROR]: chromedriver not found at {driver_path}")
-    return {}
 
     options = Options()
     options.debugger_address = "127.0.0.1:9222"
@@ -132,12 +129,12 @@ def main() -> dict:
 
     # NOTE: First check socket & then instantiate driver
     if socket.socket().connect_ex(("127.0.0.1", 9222)) != 0:
-        print(f"[ERROR]: Chrome debug is not listening on 127.0.0.1:9222")
+        print(f"[ERROR]: chrome is not listening on 127.0.0.1:9222")
         print(f"[INFO]: Usage: 'chrome --remote-debugging-port=9222'")
         return {}
 
     driver = webdriver.Chrome(service=service, options=options)
-    print(driver.title)
+    print(f"[INFO]: {driver.title}")
 
     # wait for iframe
     iframe = WebDriverWait(driver, 1).until(
@@ -155,7 +152,10 @@ def main() -> dict:
     while current < total:
         click_play_button(driver=driver)
         emit_curr_total(driver=driver)
-        time.sleep(random.triangular(30, 50, 50))
+        min_sec = settings.get("min_s", 30)
+        max_sec = settings.get("max_s", 50)
+        print(f"[INFO]: Change uniformly in the range ({min_sec},{max_sec})")
+        time.sleep(random.triangular(min_sec, max_sec, max_sec))
         current += 1
 
     return {}
