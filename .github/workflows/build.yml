@@ -26,11 +26,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: free_launch
-          path: athena/dist/free_launch.exe
+          path: athena-app/dist/free_launch.exe
 
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-${{ github.run_number }}
-          files: athena/dist/free_launch.exe
+          files: athena-app/dist/free_launch.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
