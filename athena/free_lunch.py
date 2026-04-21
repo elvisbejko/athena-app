@@ -176,9 +176,16 @@ def main() -> dict:
 
     min_sec = settings.get("min_sec", 30)
     max_sec = settings.get("max_sec", 50)
+
+    time_limit_mins = settings.get("time_limit_mins", 40)
+    time_limit_s = time_limit_mins * 60
+    start_time = time.time()
     print(f"[INFO]: Slide uniformly in range ({min_sec}s,{max_sec}s)")
 
     while current < total:
+        if time.time() - start_time >= time_limit_s:
+            print("\n[INFO]: Time limit reached, stopping loop.")
+            break
         # play slide
         click_play_button(driver=driver)
 

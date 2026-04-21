@@ -2,3 +2,4 @@ chrome_path = 'C:\Tools\chrome\chrome.exe'
 driver_path = 'C:\Tools\chromedriver\chromedriver.exe'
 min_sec = 30
 max_sec = 50
+time_limit_mins = 1
