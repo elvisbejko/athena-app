@@ -174,8 +174,8 @@ def main() -> dict:
     print(f"[INFO]: Selenium started on current: {current}")
     print(f"[INFO]: Selenium started on total: {total}")
 
-    min_sec = settings.get("min_s", 30)
-    max_sec = settings.get("max_s", 50)
+    min_sec = settings.get("min_sec", 30)
+    max_sec = settings.get("max_sec", 50)
     print(f"[INFO]: Slide uniformly in range ({min_sec}s,{max_sec}s)")
 
     while current < total:
@@ -184,7 +184,7 @@ def main() -> dict:
 
         # spinner
         wait_time = random.triangular(min_sec, max_sec, max_sec)
-        wait_with_spinner(wait_time, current, total)
+        wait_with_spinner(wait_time, current + 1, total)
 
         # incr
         current += 1
