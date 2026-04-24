@@ -74,7 +74,12 @@ def log(main: Callable[[], dict]) -> dict:
 
 
 def click_play_button(driver) -> None:
-    """Clicks the play."""
+    # re-find and switch to iframe every time
+    iframe = WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+    )
+    driver.switch_to.frame(iframe)
+
     btn = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable(
             (
@@ -100,7 +105,7 @@ def emit_curr_total(driver) -> None:
 
 
 def load_settings() -> dict:
-    """Load config from settings.json. Assumed in the same dir as the .exe."""
+    """Load config from settings.toml. Assumed in the same dir as the .exe."""
     with open("settings.toml", "rb") as f:
         return tomllib.load(f)
 
@@ -129,7 +134,7 @@ def main() -> dict:
     try:
         settings = load_settings()
     except FileNotFoundError:
-        print(f"[ERROR]: The settings.json must be in the same dir at the exe")
+        print(f"[ERROR]: The settings.toml must be in the same dir at the exe")
         return {}
     chrome_path = Path(settings.get("chrome_path", ""))
     driver_path = Path(settings.get("driver_path", ""))
