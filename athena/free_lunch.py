@@ -129,6 +129,18 @@ def wait_with_spinner(seconds: float, current: int, total: int) -> None:
         time.sleep(1)
 
 
+def _get_current(driver) -> int:
+    """Live fetch current slide from driver."""
+    label = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located(
+            (By.CSS_SELECTOR, "div.navigation-controls__label")
+        )
+    )
+
+    current, _ = map(int, label.text.split(" of "))
+    return current
+
+
 @measure
 def main() -> dict:
     """Logical entry point."""
@@ -168,7 +180,7 @@ def main() -> dict:
     print(f"[INFO]: {driver.title}")
 
     # wait for iframe
-    iframe = WebDriverWait(driver, 1).until(
+    iframe = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.TAG_NAME, "iframe"))
     )
     driver.switch_to.frame(iframe)
