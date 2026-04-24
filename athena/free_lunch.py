@@ -18,6 +18,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -192,7 +193,12 @@ def main() -> dict:
             print("\n[INFO]: Time limit reached, stopping loop.")
             break
         # play slide
-        click_play_button(driver=driver)
+        # click_play_button(driver=driver)
+        driver.switch_to.default_content()  # ensure correct context
+        body = driver.find_element(By.TAG_NAME, "body")
+        body.click()  # <-- give focus to page
+        body.send_keys(Keys.ARROW_RIGHT)
+        body.send_keys(Keys.ARROW_RIGHT)
 
         # spinner
         wait_time = random.triangular(min_sec, max_sec, max_sec)
