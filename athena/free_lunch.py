@@ -111,7 +111,9 @@ def load_settings() -> dict:
         return tomllib.load(f)
 
 
-def wait_with_spinner(seconds: float, current: int, total: int) -> None:
+def wait_with_spinner(
+    seconds: float, current: int, total: int, elapsed: int
+) -> None:
     """Waiting spinner that does not override the progress bar."""
     width = 30
 
@@ -120,9 +122,13 @@ def wait_with_spinner(seconds: float, current: int, total: int) -> None:
         bar = "#" * filled + "-" * (width - filled)
         spinner = "|/-\\"[i % 4]
 
+        total_elapsed = elapsed + i
+        mins = total_elapsed // 60
+        secs = total_elapsed % 60
+
         # NOTE: The space after s is needed for proper flushing
         print(
-            f"\r[{bar}] {current}/{total} {spinner} {i}s ",
+            f"\r[{bar}] {current}/{total} {spinner} {i}s | elapsed: {mins:02}:{secs:02} ",
             end="",
             flush=True,
         )
@@ -214,7 +220,8 @@ def main() -> dict:
 
         # spinner
         wait_time = random.triangular(min_sec, max_sec, max_sec)
-        wait_with_spinner(wait_time, current + 1, total)
+        elapsed = int(time.time() - start_time)
+        wait_with_spinner(wait_time, current + 1, total, elapsed)
 
         # incr
         current += 1
