@@ -75,11 +75,13 @@ def log(main: Callable[[], dict]) -> dict:
 
 
 def click_play_button(driver) -> None:
-    # re-find and switch to iframe every time
-    iframe = WebDriverWait(driver, 5).until(
-        EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+    # always reset context
+    driver.switch_to.default_content()
+
+    # THIS is the fix
+    WebDriverWait(driver, 15).until(
+        EC.frame_to_be_available_and_switch_to_it((By.TAG_NAME, "iframe"))
     )
-    driver.switch_to.frame(iframe)
 
     btn = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable(
@@ -89,6 +91,7 @@ def click_play_button(driver) -> None:
             )
         )
     )
+
     btn.click()
 
 
@@ -211,12 +214,12 @@ def main() -> dict:
             print("\n[INFO]: Time limit reached, stopping loop.")
             break
         # play slide
-        # click_play_button(driver=driver)
-        driver.switch_to.default_content()  # ensure correct context
-        body = driver.find_element(By.TAG_NAME, "body")
-        body.click()  # <-- give focus to page
-        body.send_keys(Keys.ARROW_RIGHT)
-        body.send_keys(Keys.ARROW_RIGHT)
+        click_play_button(driver=driver)
+        # driver.switch_to.default_content()  # ensure correct context
+        # body = driver.find_element(By.TAG_NAME, "body")
+        # body.click()  # <-- give focus to page
+        # body.send_keys(Keys.ARROW_RIGHT)
+        # body.send_keys(Keys.ARROW_RIGHT)
 
         # spinner
         wait_time = random.triangular(min_sec, max_sec, max_sec)
